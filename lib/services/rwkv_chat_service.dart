@@ -230,13 +230,11 @@ class RWKVChatService extends GetxController {
   Future<void> _checkAndLoadModel() async {
     // 首先尝试从本地加载已保存的模型信息
     ModelInfo? modelInfo = await _loadModelFromLocal();
-    RolePlayChatController? controller;
-    if (Get.isRegistered<RolePlayChatController>()) {
-      controller = Get.find<RolePlayChatController>();
-    } else {
-      controller = Get.put(RolePlayChatController());
-    }
-    controller?.modelInfo = modelInfo;
+    final RolePlayChatController controller =
+        Get.isRegistered<RolePlayChatController>()
+            ? Get.find<RolePlayChatController>()
+            : Get.put(RolePlayChatController());
+    controller.modelInfo = modelInfo;
 
     // 设置模型下载完成回调，当外部应用通知下载完成时重新加载模型
     setGlobalModelDownloadCompleteCallback((ModelInfo? info) async {
@@ -252,9 +250,9 @@ class RWKVChatService extends GetxController {
           );
         }
       }
-      if (controller?.modelInfo != null &&
+      if (controller.modelInfo != null &&
           await CommonUtil.getFileDocumentPath(
-                controller!.modelInfo!.modelPath,
+                controller.modelInfo!.modelPath,
               ) !=
               await CommonUtil.getFileDocumentPath(info!.modelPath)) {
         debugPrint('切换了模型');
@@ -268,9 +266,9 @@ class RWKVChatService extends GetxController {
           isModelLoaded = false;
           loadChatModel(info: info);
         }
-      } else if (controller?.modelInfo != null &&
+      } else if (controller.modelInfo != null &&
           await CommonUtil.getFileDocumentPath(
-                controller!.modelInfo!.modelPath,
+                controller.modelInfo!.modelPath,
               ) ==
               await CommonUtil.getFileDocumentPath(info!.modelPath) &&
           await CommonUtil.getFileDocumentPath(
@@ -288,7 +286,7 @@ class RWKVChatService extends GetxController {
         }
       } else {
         if (info?.modelType == RoleplayManageModelType.chat) {
-          controller?.modelInfo = info;
+          controller.modelInfo = info;
           debugPrint('第一次下载，切换了chat模型');
           loadChatModel();
         } else if (info?.modelType == RoleplayManageModelType.tts) {
@@ -304,7 +302,7 @@ class RWKVChatService extends GetxController {
           debugPrint('切换了tts模型33');
         } else if (info.modelType == RoleplayManageModelType.chat) {
           // 把当前的 modelinfo 保存到本地
-          controller?.modelInfo = info;
+          controller.modelInfo = info;
           ModelParamsController paramsController;
           // if (Get.isRegistered<ModelParamsController>()) {
           paramsController = Get.find<ModelParamsController>();
@@ -324,7 +322,7 @@ class RWKVChatService extends GetxController {
     });
 
     setGlobalStateFileChangeCallback((ModelInfo? info) {
-      controller?.modelInfo = modelInfo;
+      controller.modelInfo = modelInfo;
       debugPrint('stateFileChangeCallback: ${info?.toString()}');
       clearStates();
     });
